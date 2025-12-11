@@ -1,20 +1,19 @@
-/***************************************************************************************
- *                                                                                      *
- * Copyright (c) 2012 Norbert Nagold <norbert.nagold@gmail.com>                         *
- * Copyright (c) 2014 Timothy Rae <perceptualchaos2@gmail.com>                          *
- *                                                                                      *
- * This program is free software; you can redistribute it and/or modify it under        *
- * the terms of the GNU General Public License as published by the Free Software        *
- * Foundation; either version 3 of the License, or (at your option) any later           *
- * version.                                                                             *
- *                                                                                      *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
- * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
- *                                                                                      *
- * You should have received a copy of the GNU General Public License along with         *
- * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
- ****************************************************************************************/
+/*
+ * Copyright (c) 2012 Norbert Nagold <norbert.nagold@gmail.com>
+ * Copyright (c) 2014 Timothy Rae <perceptualchaos2@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package com.ichi2.anki
 
@@ -1456,8 +1455,12 @@ class NoteEditorFragment :
             !shouldHideToolbar()
         menu.findItem(R.id.action_capitalize).isChecked =
             sharedPrefs().getBoolean(PREF_NOTE_EDITOR_CAPITALIZE, true)
-        menu.findItem(R.id.action_scroll_toolbar).isChecked =
-            sharedPrefs().getBoolean(PREF_NOTE_EDITOR_SCROLL_TOOLBAR, true)
+        menu.findItem(R.id.action_scroll_toolbar).apply {
+            isChecked =
+                sharedPrefs().getBoolean(PREF_NOTE_EDITOR_SCROLL_TOOLBAR, true)
+            isEnabled =
+                !shouldHideToolbar()
+        }
     }
 
     /**
@@ -1512,6 +1515,9 @@ class NoteEditorFragment :
                     putBoolean(PREF_NOTE_EDITOR_SHOW_TOOLBAR, item.isChecked)
                 }
                 updateToolbar()
+
+                // Update the overflow action menu in order to switch the enable/disable status of the "Scroll toolbar" item on the spot
+                requireActivity().invalidateOptionsMenu()
             }
             R.id.action_capitalize -> {
                 Timber.i("NoteEditor:: Capitalize button pressed. New State: %b", !item.isChecked)
