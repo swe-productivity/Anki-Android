@@ -99,7 +99,6 @@ import com.ichi2.anki.snackbar.showSnackbar
 import com.ichi2.anki.ui.ResizablePaneManager
 import com.ichi2.anki.ui.internationalization.toSentenceCase
 import com.ichi2.anki.utils.ext.showDialogFragment
-import com.ichi2.anki.widgets.DeckDropDownAdapter
 import com.ichi2.ui.CardBrowserSearchView
 import com.ichi2.utils.AndroidUiUtils.hideKeyboard
 import com.ichi2.utils.LanguageUtil
@@ -113,7 +112,6 @@ import timber.log.Timber
 @KotlinCleanup("scan through this class and add attributes - in process")
 open class CardBrowser :
     NavigationDrawerActivity(),
-    DeckDropDownAdapter.SubtitleProvider,
     DeckSelectionListener,
     TagsDialogListener,
     ChangeManager.Subscriber {
@@ -122,7 +120,7 @@ open class CardBrowser :
      */
     @get:VisibleForTesting
     val addNoteLauncher: NoteEditorLauncher
-        get() = createAddNoteLauncher(viewModel, fragmented)
+        get() = createAddNoteLauncher(viewModel)
 
     /**
      * Provides an instance of NoteEditorLauncher for editing a note
@@ -1118,11 +1116,7 @@ open class CardBrowser :
     ): Intent = PreviewerDestination(index, idsFile).toIntent(this)
 
     private fun addNoteFromCardBrowser() {
-        if (fragmented) {
-            loadNoteEditorFragmentIfFragmented()
-        } else {
-            onAddNoteActivityResult.launch(addNoteLauncher.toIntent(this))
-        }
+        onAddNoteActivityResult.launch(addNoteLauncher.toIntent(this))
     }
 
     private val reviewerCardId: CardId
@@ -1207,9 +1201,6 @@ open class CardBrowser :
         updateMultiselectMenu()
         refreshSubtitle()
     }
-
-    override val deckDropDownSubtitle: String
-        get() = numberOfCardsOrNoteShown
 
     /**
      * @return A message stating the number of cards/notes shown by the browser.
@@ -1336,12 +1327,11 @@ open class CardBrowser :
         get() = cardBrowserFragment.shortcuts
 
     /**
-     * Sets the selected deck name and current selection count based on [deckDropDownSubtitle] in
-     * the topbar.
+     * Sets the selected deck name and current selection count based on [numberOfCardsOrNoteShown]
      */
     private fun updateAppBarInfo(deckId: DeckId?) {
         if (deckId == null || useSearchView) return
-        findViewById<TextView>(R.id.subtitle)?.text = deckDropDownSubtitle
+        findViewById<TextView>(R.id.subtitle)?.text = numberOfCardsOrNoteShown
         launchCatchingTask {
             val deckName =
                 when (deckId) {
@@ -1361,10 +1351,8 @@ open class CardBrowser :
         fun clearLastDeckId() = SharedPreferencesLastDeckIdRepository.clearLastDeckId()
 
         @VisibleForTesting
-        fun createAddNoteLauncher(
-            viewModel: CardBrowserViewModel,
-            inCardBrowserActivity: Boolean = false,
-        ): NoteEditorLauncher = NoteEditorLauncher.AddNoteFromCardBrowser(viewModel, inCardBrowserActivity)
+        fun createAddNoteLauncher(viewModel: CardBrowserViewModel): NoteEditorLauncher =
+            NoteEditorLauncher.AddNoteFromCardBrowser(viewModel)
     }
 }
 

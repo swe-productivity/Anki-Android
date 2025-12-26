@@ -123,23 +123,29 @@ open class PrefsRepository(
 
     @VisibleForTesting
     fun booleanPref(
-        @StringRes keyResId: Int,
+        key: String,
         defaultValue: Boolean,
     ): ReadWriteProperty<Any?, Boolean> =
         object : ReadWriteProperty<Any?, Boolean> {
             override fun getValue(
                 thisRef: Any?,
                 property: KProperty<*>,
-            ): Boolean = getBoolean(keyResId, defaultValue)
+            ): Boolean = sharedPrefs.getBoolean(key, defaultValue)
 
             override fun setValue(
                 thisRef: Any?,
                 property: KProperty<*>,
                 value: Boolean,
             ) {
-                putBoolean(keyResId, value)
+                sharedPrefs.edit { putBoolean(key, value) }
             }
         }
+
+    @VisibleForTesting
+    fun booleanPref(
+        @StringRes keyResId: Int,
+        defaultValue: Boolean,
+    ): ReadWriteProperty<Any?, Boolean> = booleanPref(key(keyResId), defaultValue)
 
     @VisibleForTesting
     fun stringPref(
@@ -271,6 +277,8 @@ open class PrefsRepository(
     val autoFocusTypeAnswer by booleanPref(R.string.type_in_answer_focus_key, true)
     val showAnswerFeedback by booleanPref(R.string.show_answer_feedback_key, defaultValue = true)
     val showAnswerButtons by booleanPref(R.string.show_answer_buttons_key, true)
+    val keepScreenOn by booleanPref(R.string.keep_screen_on_preference, defaultValue = false)
+    val hideHardAndEasyButtons by booleanPref(R.string.hide_hard_and_easy_key, defaultValue = false)
 
     val doubleTapInterval by intPref(R.string.double_tap_timeout_pref_key, defaultValue = 200)
     val newStudyScreenAnswerButtonSize by intPref(R.string.answer_button_size_pref_key, defaultValue = 100)

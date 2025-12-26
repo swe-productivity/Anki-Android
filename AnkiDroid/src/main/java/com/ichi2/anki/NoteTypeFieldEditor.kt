@@ -1,19 +1,19 @@
-/****************************************************************************************
- * Copyright (c) 2015 Ryan Annis <squeenix@live.ca>                                     *
- * Copyright (c) 2015 Timothy Rae <perceptualchaos2@gmail.com>                          *
- *                                                                                      *
- * This program is free software; you can redistribute it and/or modify it under        *
- * the terms of the GNU General Public License as published by the Free Software        *
- * Foundation; either version 3 of the License, or (at your option) any later           *
- * version.                                                                             *
- *                                                                                      *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
- * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
- *                                                                                      *
- * You should have received a copy of the GNU General Public License along with         *
- * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
- ****************************************************************************************/
+/*
+ * Copyright (c) 2015 Ryan Annis <squeenix@live.ca>
+ * Copyright (c) 2015 Timothy Rae <perceptualchaos2@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.ichi2.anki
 
 import android.content.Context
@@ -25,7 +25,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
-import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.BundleCompat
@@ -34,6 +33,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.common.annotations.NeedsTest
+import com.ichi2.anki.databinding.ItemNotetypeFieldBinding
 import com.ichi2.anki.databinding.NoteTypeFieldEditorBinding
 import com.ichi2.anki.dialogs.ConfirmationDialog
 import com.ichi2.anki.dialogs.LocaleSelectionDialog
@@ -271,8 +271,12 @@ class NoteTypeFieldEditor : AnkiActivity(R.layout.note_type_field_editor) {
         } else {
             try {
                 getColUnsafe.modSchema()
+                val fieldName = noteFields[currentPos].name
                 ConfirmationDialog().let {
-                    it.setArgs(resources.getString(R.string.field_delete_warning))
+                    it.setArgs(
+                        title = fieldName,
+                        message = resources.getString(R.string.field_delete_warning),
+                    )
                     it.setConfirm(confirm)
                     showDialogFragment(it)
                 }
@@ -570,17 +574,17 @@ internal class NoteFieldAdapter(
         convertView: View?,
         parent: ViewGroup,
     ): View {
-        val view =
-            convertView ?: LayoutInflater
-                .from(context)
-                .inflate(R.layout.item_notetype_field, parent, false)
-
-        val nameTextView: TextView = view.findViewById(R.id.field_name)
+        val binding =
+            if (convertView != null) {
+                ItemNotetypeFieldBinding.bind(convertView)
+            } else {
+                ItemNotetypeFieldBinding.inflate(LayoutInflater.from(context), parent, false)
+            }
 
         getItem(position)?.let {
             val (name, kind) = it
-            nameTextView.text = name
-            nameTextView.setCompoundDrawablesRelativeWithIntrinsicBoundsKt(
+            binding.fieldName.text = name
+            binding.fieldName.setCompoundDrawablesRelativeWithIntrinsicBoundsKt(
                 end =
                     when (kind) {
                         NodetypeKind.SORT -> R.drawable.ic_sort
@@ -588,6 +592,6 @@ internal class NoteFieldAdapter(
                     },
             )
         }
-        return view
+        return binding.root
     }
 }

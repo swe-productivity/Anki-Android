@@ -70,6 +70,7 @@ import com.ichi2.anki.observability.ChangeManager
 import com.ichi2.anki.observability.undoableOp
 import com.ichi2.anki.pages.CardInfoDestination
 import com.ichi2.anki.preferences.SharedPreferencesProvider
+import com.ichi2.anki.utils.ext.currentCardBrowse
 import com.ichi2.anki.utils.ext.normalizeForSearch
 import com.ichi2.anki.utils.ext.setUserFlagForCards
 import kotlinx.coroutines.Deferred
@@ -92,6 +93,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import net.ankiweb.rsdroid.BackendException
 import org.jetbrains.annotations.VisibleForTesting
@@ -225,16 +227,16 @@ class CardBrowserViewModel(
     val selectedRows: Set<CardOrNoteId> get() = _selectedRows
 
     val flowOfMultiSelectModeChanged =
-        MutableStateFlow<ChangeMultiSelectMode>(
-            ChangeMultiSelectMode.fromState(
-                savedStateHandle[STATE_MULTISELECT] ?: false,
-            ),
+        savedStateHandle.getMutableStateFlow<ChangeMultiSelectMode>(
+            key = STATE_MULTISELECT,
+            initialValue = SingleSelectCause.Other,
         )
 
+    @Parcelize
     data class RowSelection(
         val rowId: CardOrNoteId,
         val topOffset: Int,
-    )
+    ) : Parcelable
 
     val isInMultiSelectMode
         get() = flowOfMultiSelectModeChanged.value.resultedInMultiSelect
@@ -327,7 +329,7 @@ class CardBrowserViewModel(
 
     suspend fun queryCardInfoDestination(): CardInfoDestination? {
         val firstSelectedCard = selectedRows.firstOrNull()?.toCardId(cardsOrNotes) ?: return null
-        return CardInfoDestination(firstSelectedCard, TR.cardStatsCurrentCard(TR.qtMiscBrowse()))
+        return CardInfoDestination(firstSelectedCard, TR.currentCardBrowse())
     }
 
     suspend fun queryDataForCardEdit(id: CardOrNoteId): CardId = id.toCardId(cardsOrNotes)
@@ -432,11 +434,6 @@ class CardBrowserViewModel(
             .onEach { cardsOrNotes ->
                 Timber.d("loading columns for %s mode", cardsOrNotes)
                 updateActiveColumns(BrowserColumnCollection.load(sharedPrefs(), cardsOrNotes))
-            }.launchIn(viewModelScope)
-
-        flowOfMultiSelectModeChanged
-            .onEach {
-                savedStateHandle[STATE_MULTISELECT] = it.resultedInMultiSelect
             }.launchIn(viewModelScope)
 
         viewModelScope.launch {
@@ -1371,13 +1368,14 @@ class CardBrowserViewModel(
         data object DirectionChange : ChangeCardOrder
     }
 
-    sealed class ChangeMultiSelectMode {
+    sealed class ChangeMultiSelectMode : Parcelable {
         val resultedInMultiSelect: Boolean get() =
             when (this) {
                 is MultiSelectCause -> true
                 is SingleSelectCause -> false
             }
 
+        @Parcelize
         sealed class SingleSelectCause : ChangeMultiSelectMode() {
             data class DeselectRow(
                 val selection: RowSelection,
@@ -1389,24 +1387,17 @@ class CardBrowserViewModel(
 
             data object Other : SingleSelectCause()
 
+            @IgnoredOnParcel
             var previouslySelectedRowIds: Set<CardOrNoteId>? = null
         }
 
+        @Parcelize
         sealed class MultiSelectCause : ChangeMultiSelectMode() {
             data class RowSelected(
                 val selection: RowSelection,
             ) : MultiSelectCause()
 
             data object Other : MultiSelectCause()
-        }
-
-        companion object {
-            fun fromState(inMultiSelectMode: Boolean): ChangeMultiSelectMode =
-                if (inMultiSelectMode) {
-                    MultiSelectCause.Other
-                } else {
-                    SingleSelectCause.Other
-                }
         }
     }
 

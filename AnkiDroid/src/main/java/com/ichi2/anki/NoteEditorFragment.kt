@@ -91,6 +91,7 @@ import com.ichi2.anki.android.input.ShortcutGroupProvider
 import com.ichi2.anki.android.input.shortcut
 import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
+import com.ichi2.anki.common.utils.ext.ifZero
 import com.ichi2.anki.dialogs.ConfirmationDialog
 import com.ichi2.anki.dialogs.DeckSelectionDialog.DeckSelectionListener
 import com.ichi2.anki.dialogs.DiscardChangesDialog
@@ -208,6 +209,7 @@ const val CALLER_KEY = "caller"
  */
 @KotlinCleanup("Go through the class and select elements to fix")
 @KotlinCleanup("see if we can lateinit")
+@NeedsTest("19733")
 class NoteEditorFragment :
     Fragment(R.layout.note_editor_fragment),
     DeckSelectionListener,
@@ -247,7 +249,9 @@ class NoteEditorFragment :
     private var pasteOcclusionImageButton: Button? = null
 
     // non-null after onCollectionLoaded
-    private var editorNote: Note? = null
+    @VisibleForTesting
+    var editorNote: Note? = null
+        private set
 
     private val multimediaViewModel: MultimediaViewModel by activityViewModels()
 
@@ -478,8 +482,9 @@ class NoteEditorFragment :
             }
 
     override val baseSnackbarBuilder: SnackbarBuilder = {
-        if (sharedPrefs().getBoolean(PREF_NOTE_EDITOR_SHOW_TOOLBAR, true)) {
-            anchorView = requireView().findViewById<Toolbar>(R.id.editor_toolbar)
+        val view = this@NoteEditorFragment.view?.findViewById<Toolbar?>(R.id.editor_toolbar)
+        if (view?.isVisible == true) {
+            anchorView = view
         }
     }
 
@@ -817,20 +822,14 @@ class NoteEditorFragment :
 
         deckId = requireArguments().getLong(EXTRA_DID, deckId)
         if (addNote) {
-            // When adding and if we didn't receive a valid deck id or it's the 'Default' deck, look
-            // at what deck is selected and use that(guards against certain scenarios when deleting
-            // a deck and no deck is visually selected in DeckPicker)
-            if (deckId == 0L || deckId == Consts.DEFAULT_DECK_ID) {
-                // check if this is the actual deck selected
-                val currentSelectedDeckId = col.decks.selected()
-                if (currentSelectedDeckId != Consts.DEFAULT_DECK_ID) {
-                    deckId = currentSelectedDeckId
-                }
-            }
-            // Also guard against adding to a filtered deck in which case revert to 'Default'
+            // When adding and if we didn't receive a valid deck id or it's the 'Default' deck,
+            // use the recommended deck for adding
+            deckId = deckId.ifZero { col.defaultsForAdding().deckId }
+
+            // Also guard against adding to a filtered deck
             val deck = col.decks.getLegacy(deckId)
             if (deck == null || deck.isFiltered) {
-                deckId = Consts.DEFAULT_DECK_ID
+                deckId = col.defaultsForAdding().deckId
             }
         } else {
             // When editing we always have a valid currentEditCard. Check to see if it's from a normal
@@ -1388,9 +1387,16 @@ class NoteEditorFragment :
                     }
                 }
             }
-            closeNoteEditor()
+
+            closeNoteEditorAfterSave()
             return
         }
+    }
+
+    private fun closeNoteEditorAfterSave() {
+        isFieldEdited = false
+        isTagsEdited = false
+        closeNoteEditor()
     }
 
     /**
@@ -1409,8 +1415,9 @@ class NoteEditorFragment :
         }
         // refresh the note object to reflect the database changes
         withCol { editorNote!!.load(this@withCol) }
+
         // close note editor
-        closeNoteEditor()
+        closeNoteEditorAfterSave()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -2793,7 +2800,7 @@ class NoteEditorFragment :
 
         // Update deck
         if (!getColUnsafe.config.getBool(ConfigKey.Bool.ADDING_DEFAULTS_TO_CURRENT_DECK)) {
-            deckId = noteType.did
+            deckId = getColUnsafe.defaultsForAdding().deckId
         }
 
         refreshNoteData(FieldChangeType.changeFieldCount(shouldReplaceNewlines()))

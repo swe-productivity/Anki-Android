@@ -113,10 +113,10 @@ class RecyclerFastScroller
                 }
             }
 
+        /**
+         * @throws RuntimeException if set to more than 48dp
+         */
         var touchTargetWidth: Int = 24.dp.toPx(context)
-            /**
-             * @param touchTargetWidth In pixels, less than or equal to 48dp
-             */
             set(touchTargetWidth) {
                 field = touchTargetWidth
 
@@ -197,7 +197,7 @@ class RecyclerFastScroller
 
                         onHandleTouchListener?.onTouch(v, event)
                         when (event.actionMasked) {
-                            event.actionMasked -> {
+                            MotionEvent.ACTION_DOWN -> {
                                 handle.isPressed = true
                                 recyclerView.stopScroll()
 
@@ -210,7 +210,7 @@ class RecyclerFastScroller
                                 lastPressedYAdjustedToInitial = event.y + handle.y + bar.y
                                 lastAppBarLayoutOffset = appBarLayoutOffset
                             }
-                            event.actionMasked -> {
+                            MotionEvent.ACTION_MOVE -> {
                                 val newHandlePressedY = event.y + handle.y + bar.y
                                 val barHeight = bar.height
                                 val newHandlePressedYAdjustedToInitial =
@@ -231,7 +231,7 @@ class RecyclerFastScroller
                                 lastPressedYAdjustedToInitial = newHandlePressedYAdjustedToInitial
                                 lastAppBarLayoutOffset = appBarLayoutOffset
                             }
-                            event.actionMasked -> {
+                            MotionEvent.ACTION_UP -> {
                                 lastPressedYAdjustedToInitial = -1f
 
                                 recyclerView.stopNestedScroll()

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     // Gradle plugin portal
     alias(libs.plugins.tripletPlay)
@@ -87,6 +89,7 @@ android {
         // This ensures the correct ordering between the various types of releases (dev < alpha < beta < release) which is
         // needed for upgrades to be offered correctly.
         versionCode=22400100
+        // If you change this to a new version, you probably also want to update .gradle/workflows/milestone.yml for the new version...
         versionName="2.24.0alpha0"
         minSdk = libs.versions.minSdk.get().toInteger()
 
@@ -248,9 +251,12 @@ android {
         targetCompatibility JavaVersion.VERSION_17
         coreLibraryDesugaringEnabled = true
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
     }
+
 
     packagingOptions {
         resources {
