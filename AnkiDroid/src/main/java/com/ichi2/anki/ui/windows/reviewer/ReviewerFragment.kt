@@ -117,7 +117,7 @@ class ReviewerFragment :
     private lateinit var bindingMap: BindingMap<ReviewerBinding, ViewerAction>
     private var shakeDetector: ShakeDetector? = null
     private val sensorManager get() = ContextCompat.getSystemService(requireContext(), SensorManager::class.java)
-    private val isBigScreen: Boolean get() = binding.complementsLayout != null
+    private val isBigScreen: Boolean get() = resources.configuration.smallestScreenWidthDp >= 720
     private var webviewHasFocus = false
 
     override val baseSnackbarBuilder: SnackbarBuilder = {
@@ -138,7 +138,7 @@ class ReviewerFragment :
         stdHtml(
             context = requireContext(),
             extraJsAssets = listOf("scripts/ankidroid-reviewer.js"),
-            nightMode = Themes.currentTheme.isNightMode,
+            nightMode = Themes.isNightTheme,
         )
 
     override fun onStart() {
@@ -388,13 +388,13 @@ class ReviewerFragment :
     private fun setupCounts() {
         viewModel.countsFlow
             .flowWithLifecycle(lifecycle)
-            .collectLatestIn(lifecycleScope) { (counts, countsType) ->
-                binding.newCount.text = counts.new.toString()
-                binding.learnCount.text = counts.lrn.toString()
-                binding.reviewCount.text = counts.rev.toString()
+            .collectLatestIn(lifecycleScope) { counts ->
+                binding.newCount.text = counts.new
+                binding.learnCount.text = counts.learn
+                binding.reviewCount.text = counts.review
 
                 val currentCount =
-                    when (countsType) {
+                    when (counts.activeQueue) {
                         Counts.Queue.NEW -> binding.newCount
                         Counts.Queue.LRN -> binding.learnCount
                         Counts.Queue.REV -> binding.reviewCount
@@ -464,15 +464,13 @@ class ReviewerFragment :
     }
 
     private fun setupToolbarPosition() {
-        if (isBigScreen) return
         when (Prefs.toolbarPosition) {
             ToolbarPosition.TOP -> return
             ToolbarPosition.NONE -> binding.toolsLayout.isVisible = false
             ToolbarPosition.BOTTOM -> {
-                val mainLayout = binding.mainLayout!! // we can use !! due to isWindowCompact
-                val toolbar = binding.toolsLayout
-                mainLayout.removeView(toolbar)
-                mainLayout.addView(toolbar, mainLayout.childCount)
+                if (isBigScreen) return
+                binding.mainLayout.removeView(binding.toolsLayout)
+                binding.mainLayout.addView(binding.toolsLayout)
             }
         }
     }

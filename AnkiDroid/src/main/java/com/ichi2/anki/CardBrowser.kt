@@ -338,6 +338,7 @@ open class CardBrowser :
             )
         } else {
             binding.noteEditorFrame?.isVisible = false
+            binding.cardBrowserResizingDivider?.isVisible = false
         }
 
         // must be called once we have an accessible collection
@@ -996,17 +997,6 @@ open class CardBrowser :
         if (cardIds.any { it == reviewerCardId }) {
             reloadRequired = true
         }
-    }
-
-    /**
-     * @return `false` if the user may proceed; `true` if a warning is shown due to being in [NOTES]
-     */
-    fun warnUserIfInNotesOnlyMode(): Boolean {
-        if (viewModel.cardsOrNotes != NOTES) return false
-        showSnackbar(R.string.card_browser_unavailable_when_notes_mode) {
-            setAction(R.string.error_handling_options) { cardBrowserFragment.showOptionsDialog() }
-        }
-        return true
     }
 
     @NeedsTest("filter-marked query needs testing")
