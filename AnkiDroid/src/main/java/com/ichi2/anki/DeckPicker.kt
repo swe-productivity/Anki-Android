@@ -187,6 +187,7 @@ import com.ichi2.utils.ImportResult
 import com.ichi2.utils.ImportUtils
 import com.ichi2.utils.NetworkUtils
 import com.ichi2.utils.NetworkUtils.isActiveNetworkMetered
+import com.ichi2.utils.Permissions
 import com.ichi2.utils.VersionUtils
 import com.ichi2.utils.cancelable
 import com.ichi2.utils.checkBoxPrompt
@@ -499,11 +500,6 @@ open class DeckPicker :
             mouseContextMenuHandler.showContextMenu(deckPickerBinding.decks, x, y)
         }
     }
-
-    private val notificationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            Timber.i("notification permission: %b", it)
-        }
 
     // ----------------------------------------------------------------------------
     // ANDROID ACTIVITY METHODS
@@ -1446,9 +1442,10 @@ open class DeckPicker :
     fun refreshState() {
         // Due to the App Introduction, this may be called before permission has been granted.
         if (syncOnResume && hasCollectionStoragePermissions()) {
-            Timber.i("Performing Sync on Resume")
-            sync()
             syncOnResume = false
+            Timber.i("Performing Sync on Resume")
+            Permissions.requestNotificationPermissionsForSyncing(this)
+            sync()
         } else {
             selectNavigationItem(R.id.nav_decks)
             updateDeckList()
@@ -2031,8 +2028,6 @@ open class DeckPicker :
             return
         }
 
-        AccountActivity.checkNotificationPermission(this, notificationPermissionLauncher)
-
         /** Nested function that makes the connection to
          * the sync server and starts syncing the data */
         fun doSync() {
@@ -2048,6 +2043,7 @@ open class DeckPicker :
                     Prefs.allowSyncOnMeteredConnections = isCheckboxChecked
                 }
             }
+            refreshState()
         } else {
             doSync()
         }
@@ -2417,6 +2413,27 @@ open class DeckPicker :
 
         private const val PREF_DECK_PICKER_PANE_WEIGHT = "deckPickerPaneWeight"
         private const val PREF_STUDY_OPTIONS_PANE_WEIGHT = "studyOptionsPaneWeight"
+
+        /**
+         * Builds an intent for [DeckPicker]
+         */
+        fun getIntent(
+            context: Context,
+            autoSync: Boolean = false,
+        ) = Intent(context, DeckPicker::class.java).apply {
+            if (autoSync) {
+                putExtra(INTENT_SYNC_FROM_LOGIN, true)
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        this.intent = intent
+        if (intent.hasExtra(INTENT_SYNC_FROM_LOGIN)) {
+            Timber.i("Sync requested from Login")
+            this.syncOnResume = true
+        }
     }
 
     override fun opExecuted(

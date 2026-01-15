@@ -73,6 +73,7 @@ import com.ichi2.anki.dialogs.DeckSelectionDialog
 import com.ichi2.anki.dialogs.DeckSelectionDialog.DeckSelectionListener
 import com.ichi2.anki.dialogs.DiscardChangesDialog
 import com.ichi2.anki.dialogs.InsertFieldDialog
+import com.ichi2.anki.libanki.CardOrdinal
 import com.ichi2.anki.libanki.CardTemplates
 import com.ichi2.anki.libanki.Collection
 import com.ichi2.anki.libanki.Note
@@ -148,11 +149,11 @@ open class CardTemplateEditor :
      * The inner HashMap's key is the editor window ID (e.g., R.id.front_edit).
      * The value is the cursor position within that editor window.
      */
-    private var tabToCursorPositions: HashMap<Int, HashMap<Int, Int>> = HashMap()
+    private var tabToCursorPositions: HashMap<CardOrdinal, HashMap<Int, Int>> = HashMap()
 
     // the current editor view among front/style/back
     private var tabToViewId: HashMap<Int, Int?> = HashMap()
-    private var startingOrdId = 0
+    private var startingOrdId: CardOrdinal = 0
 
     /**
      * If true, the view is split in two. The template editor appears on the leading side and the previewer on the trailing side.
@@ -193,7 +194,7 @@ open class CardTemplateEditor :
             // get id for currently edited note (optional)
             noteId = intent.getLongExtra(EDITOR_NOTE_ID, -1L)
             // get id for currently edited template (optional)
-            startingOrdId = intent.getIntExtra("ordId", -1)
+            startingOrdId = intent.getIntExtra(EDITOR_START_ORD_ID, -1)
             tabToCursorPositions[0] = hashMapOf()
             tabToViewId[0] = R.id.front_edit
         } else {
@@ -1531,5 +1532,25 @@ open class CardTemplateEditor :
 
         @Suppress("unused")
         private const val REQUEST_CARD_BROWSER_APPEARANCE = 1
+
+        @CheckResult
+        fun getIntent(
+            context: Context,
+            noteTypeId: NoteTypeId,
+            noteId: NoteId? = null,
+            ord: CardOrdinal? = null,
+        ) = Intent(context, CardTemplateEditor::class.java)
+            .apply {
+                putExtra(EDITOR_NOTE_TYPE_ID, noteTypeId)
+                noteId?.let { putExtra(EDITOR_NOTE_ID, it) }
+                ord?.let { putExtra(EDITOR_START_ORD_ID, it) }
+
+                Timber.d(
+                    "Built intent for CardTemplateEditor; ntid: %s; nid: %s; ord: %s",
+                    noteTypeId,
+                    noteId,
+                    ord,
+                )
+            }
     }
 }

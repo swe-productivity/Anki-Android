@@ -43,7 +43,7 @@
 ~ You should have received a copy of the GNU General Public License along with
 ~ this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Navigation drawer strings -->
     <string name="drawer_open">Aberi sa barra de navigatzione</string>
     <string name="drawer_close">Serra sa barra de navigatzione</string>
@@ -193,8 +193,6 @@
     <string name="select_tts" maxLength="28">Imposta sa limba de su sintetizadore de boghe</string>
     <string name="custom_study" maxLength="28">Istùdiu personalizadu</string>
     <string name="dyn_deck_desc">Custu est unu matzu ispetziale pro istudiare in foras de sa pranificatzione normale. Sas cartas ant a torrare in manera automàtica a sos matzos originales issoro a pustis chi las as a revisionare. Iscantzellende custu matzu dae sa lista de matzos at a fàghere torrare totu sas cartas chi abarrant a sos matzos originales issoro.</string>
-    <string name="steps_error">Sos passos depent èssere in unu nùmeru prus mannu de 0</string>
-    <string name="steps_min_error">B\'at bisòngiu de a su nessi unu passu</string>
     <string name="tag_editor_add_feedback">Toca “%2$s” pro cunfirmare s\'annanta de “%1$s”</string>
     <string name="tag_editor_add_feedback_existing">Eticheta chi esistit “%1$s” seletzionada</string>
     <!-- Time spans -->
@@ -265,9 +263,12 @@
     <string name="create_shortcut_error">Errore annanghende s\'incurtzada: %s</string>
     <string name="note_editor_capitalize" comment="This is for a switch with a checkbox - on: enabled" maxLength="28">Pone in majùsculu sas fràsias</string>
     <string name="menu_scroll_toolbar" comment="Checkbox stating whether note editor toolbar is scrollable or stacked. Checked: Scroll" maxLength="28">Barra de iscurrimentu</string>
-    <!-- Symbols used as Button text in IncrementNumberRangePreference -->
+    <!-- IncrementNumberRangePreference -->
     <string name="plus_sign" comment="Label for increment button in IncrementerNumberRangePreference">+</string>
     <string name="minus_sign" comment="Label for decrement button in IncrementerNumberRangePreference">-</string>
+    <string name="invalid_value" comment="Error message in IncrementerNumberRangePreference when input is not a valid number">Invalid value</string>
+    <string name="maximum_value_is" comment="Error message in IncrementerNumberRangePreference. %d is the maximum allowed value">Maximum value is %d</string>
+    <string name="minimum_value_is" comment="Error message in IncrementerNumberRangePreference. %d is the minimum allowed value">Minimum value is %d</string>
     <!-- Used for credential empty warning message -->
     <string name="invalid_email">Inserta un\'indiritzu de posta vàlidu</string>
     <string name="password_empty">Sa crae est netzessària</string>
@@ -348,7 +349,6 @@
     <string name="format_deck_description_as_markdown">Format as Markdown</string>
     <string name="help_button_content_description">Open help for ‘%s’</string>
     <string name="failed_to_copy">Còpia fallida</string>
-    <string name="card_browser_unavailable_when_notes_mode">No a disponimentu in sa modalidade ‘Notas’</string>
     <plurals name="unbury_cards_feedback">
         <item quantity="one">%d carta no interrada</item>
         <item quantity="other">%d cartas no interradas</item>

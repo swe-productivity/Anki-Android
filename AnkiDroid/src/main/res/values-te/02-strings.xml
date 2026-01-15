@@ -43,7 +43,7 @@
 ~ You should have received a copy of the GNU General Public License along with
 ~ this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Navigation drawer strings -->
     <string name="drawer_open">సొరుగు తెరవండి</string>
     <string name="drawer_close">సొరుగును మూసివేయండి</string>
@@ -191,8 +191,6 @@
     <string name="select_tts" maxLength="28">TTS భాషను సెట్ చేయండి</string>
     <string name="custom_study" maxLength="28">అనుకూల అధ్యయనం</string>
     <string name="dyn_deck_desc">సాధారణ షెడ్యూల్ అధ్యయనం కోసం ఇది ప్రత్యేక డెక్. స్వయంచాలకంగా కార్డ్లను వాటిని సమీక్షించి, దాని అసలు డెక్స్కు వాటిని స్వయంచాలకంగా పునరుద్ధరించండి. డెక్ జాబితా నుండి ఈ డెక్ను తొలగిస్తే మిగిలిన అన్ని కార్డులను వారి అసలు డెక్కు తిరిగి పంపుతుంది.</string>
-    <string name="steps_error">దశలు 0 కన్నా ఎక్కువ ఉండాలి</string>
-    <string name="steps_min_error">కనీసం ఒక అడుగు అవసరం</string>
     <string name="tag_editor_add_feedback">\"%1$s\" ని జోడించడాన్ని నిర్ధారించడానికి \"%2$s\" తాకండి</string>
     <string name="tag_editor_add_feedback_existing">ఇప్పటికే ఉన్న ట్యాగ్ \"%1$s\" ఎంచుకోబడింది</string>
     <!-- Time spans -->
@@ -263,9 +261,12 @@
     <string name="create_shortcut_error">సత్వరమార్గాన్ని జోడించడంలో లోపం: %s</string>
     <string name="note_editor_capitalize" comment="This is for a switch with a checkbox - on: enabled" maxLength="28">వాక్యాలను క్యాపిటలైజ్ చేయండి</string>
     <string name="menu_scroll_toolbar" comment="Checkbox stating whether note editor toolbar is scrollable or stacked. Checked: Scroll" maxLength="28">స్క్రోల్ టూల్‌బార్</string>
-    <!-- Symbols used as Button text in IncrementNumberRangePreference -->
+    <!-- IncrementNumberRangePreference -->
     <string name="plus_sign" comment="Label for increment button in IncrementerNumberRangePreference">+</string>
     <string name="minus_sign" comment="Label for decrement button in IncrementerNumberRangePreference">-</string>
+    <string name="invalid_value" comment="Error message in IncrementerNumberRangePreference when input is not a valid number">Invalid value</string>
+    <string name="maximum_value_is" comment="Error message in IncrementerNumberRangePreference. %d is the maximum allowed value">Maximum value is %d</string>
+    <string name="minimum_value_is" comment="Error message in IncrementerNumberRangePreference. %d is the minimum allowed value">Minimum value is %d</string>
     <!-- Used for credential empty warning message -->
     <string name="invalid_email">చెల్లుబాటు అయ్యే ఇమెయిల్ను నమోదు చేయండి</string>
     <string name="password_empty">పాస్‌వర్డ్ అవసరం</string>
@@ -346,7 +347,6 @@
     <string name="format_deck_description_as_markdown">Format as Markdown</string>
     <string name="help_button_content_description">Open help for ‘%s’</string>
     <string name="failed_to_copy">కాపీ చేయడంలో విఫలమైంది</string>
-    <string name="card_browser_unavailable_when_notes_mode">\'నోట్స్\' మోడ్‌లో అందుబాటులో లేదు</string>
     <plurals name="unbury_cards_feedback">
         <item quantity="one">%d కార్డ్ పాతిపెట్టబడలేదు</item>
         <item quantity="other">%d కార్డ్‌లు పాతిపెట్టబడలేదు</item>

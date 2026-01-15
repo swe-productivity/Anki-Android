@@ -43,7 +43,7 @@
 ~ You should have received a copy of the GNU General Public License along with
 ~ this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Navigation drawer strings -->
     <string name="drawer_open">ナビゲーションドロワーを開く</string>
     <string name="drawer_close">ナビゲーションドロワーを閉じる</string>
@@ -188,8 +188,6 @@
     <string name="select_tts" maxLength="28">読み上げ用の言語を選択</string>
     <string name="custom_study" maxLength="28">カスタム学習</string>
     <string name="dyn_deck_desc">これは標準のスケジュールから外れて学習する特別なデッキです。 復習が終わったカードは自動的に元のデッキに戻ります。 このデッキを削除すると、残りのカードもすべて元のデッキに戻ります。</string>
-    <string name="steps_error">習得ステップには1以上の数字を入力してください</string>
-    <string name="steps_min_error">少なくとも 1 つの習得ステップが必要です</string>
     <string name="tag_editor_add_feedback">「%1$s」の追加を確定するには「%2$s」をタップしてください</string>
     <string name="tag_editor_add_feedback_existing">既存のタグ「%1$s」を選択しました</string>
     <!-- Time spans -->
@@ -260,9 +258,12 @@
     <string name="create_shortcut_error">ショートカット追加のエラー: %s</string>
     <string name="note_editor_capitalize" comment="This is for a switch with a checkbox - on: enabled" maxLength="28">英語入力の際に文頭を大文字</string>
     <string name="menu_scroll_toolbar" comment="Checkbox stating whether note editor toolbar is scrollable or stacked. Checked: Scroll" maxLength="28">ツールバーをスクロール表示</string>
-    <!-- Symbols used as Button text in IncrementNumberRangePreference -->
+    <!-- IncrementNumberRangePreference -->
     <string name="plus_sign" comment="Label for increment button in IncrementerNumberRangePreference">+</string>
     <string name="minus_sign" comment="Label for decrement button in IncrementerNumberRangePreference">-</string>
+    <string name="invalid_value" comment="Error message in IncrementerNumberRangePreference when input is not a valid number">Invalid value</string>
+    <string name="maximum_value_is" comment="Error message in IncrementerNumberRangePreference. %d is the maximum allowed value">Maximum value is %d</string>
+    <string name="minimum_value_is" comment="Error message in IncrementerNumberRangePreference. %d is the minimum allowed value">Minimum value is %d</string>
     <!-- Used for credential empty warning message -->
     <string name="invalid_email">有効なメールアドレスを入力してください</string>
     <string name="password_empty">パスワードが必要です</string>
@@ -341,7 +342,6 @@
     <string name="format_deck_description_as_markdown">Markdown形式でフォーマット</string>
     <string name="help_button_content_description">「%s」のヘルプを開く</string>
     <string name="failed_to_copy">コピーに失敗しました</string>
-    <string name="card_browser_unavailable_when_notes_mode">「ノート」モードでは使用できません</string>
     <plurals name="unbury_cards_feedback">
         <item quantity="other">%d枚のカードの「今日は非表示」を解除しました</item>
     </plurals>

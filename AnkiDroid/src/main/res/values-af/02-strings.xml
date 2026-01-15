@@ -43,7 +43,7 @@
 ~ You should have received a copy of the GNU General Public License along with
 ~ this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Navigation drawer strings -->
     <string name="drawer_open">Maak laai oop</string>
     <string name="drawer_close">Maak laai toe</string>
@@ -191,8 +191,6 @@
     <string name="select_tts" maxLength="28">Stel TTS-taal</string>
     <string name="custom_study" maxLength="28">Gepasmaakte studie</string>
     <string name="dyn_deck_desc">Dit is \'n spesiale dek vir studie buite die normale skedule. Kaartjies sal outomaties na hul oorspronklike dekke teruggestuur word nadat jy dit hersien het. Die verwydering van hierdie dek uit die deklys sal alle oorblywende kaartjies na hul oorspronklike dek terugstuur.</string>
-    <string name="steps_error">Stappe moet getalle groter as 0 wees</string>
-    <string name="steps_min_error">Ten minste een stap is nodig</string>
     <string name="tag_editor_add_feedback">Raak \"%2$s\" aan om \"%1$s\" by te voeg</string>
     <string name="tag_editor_add_feedback_existing">Bestaande etiket “%1$s” gekies</string>
     <!-- Time spans -->
@@ -263,9 +261,12 @@
     <string name="create_shortcut_error">Fout met byvoeging van kortpad: %s</string>
     <string name="note_editor_capitalize" comment="This is for a switch with a checkbox - on: enabled" maxLength="28">Hoofletters sinne</string>
     <string name="menu_scroll_toolbar" comment="Checkbox stating whether note editor toolbar is scrollable or stacked. Checked: Scroll" maxLength="28">Rol nutsbalk</string>
-    <!-- Symbols used as Button text in IncrementNumberRangePreference -->
+    <!-- IncrementNumberRangePreference -->
     <string name="plus_sign" comment="Label for increment button in IncrementerNumberRangePreference">+</string>
     <string name="minus_sign" comment="Label for decrement button in IncrementerNumberRangePreference">-</string>
+    <string name="invalid_value" comment="Error message in IncrementerNumberRangePreference when input is not a valid number">Invalid value</string>
+    <string name="maximum_value_is" comment="Error message in IncrementerNumberRangePreference. %d is the maximum allowed value">Maximum value is %d</string>
+    <string name="minimum_value_is" comment="Error message in IncrementerNumberRangePreference. %d is the minimum allowed value">Minimum value is %d</string>
     <!-- Used for credential empty warning message -->
     <string name="invalid_email">Voer \'n geldige e-posadres in</string>
     <string name="password_empty">Wagwoord word vereis</string>
@@ -346,7 +347,6 @@
     <string name="format_deck_description_as_markdown">Format as Markdown</string>
     <string name="help_button_content_description">Open help for ‘%s’</string>
     <string name="failed_to_copy">Kon nie kopieer nie</string>
-    <string name="card_browser_unavailable_when_notes_mode">Onbeskikbaar in \'Notas\'-modus</string>
     <plurals name="unbury_cards_feedback">
         <item quantity="one">%d kaart onbegrawe</item>
         <item quantity="other">%d kaarte onbegrawe</item>
