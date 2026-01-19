@@ -20,21 +20,14 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.tabs.TabLayout
 import com.ichi2.anki.R
 import com.ichi2.anki.databinding.FragmentTemplatePreviewerBinding
-import com.ichi2.anki.launchCatchingTask
 import com.ichi2.anki.libanki.CardOrdinal
 import com.ichi2.anki.snackbar.BaseSnackbarBuilderProvider
 import com.ichi2.anki.snackbar.SnackbarBuilder
-import com.ichi2.anki.utils.ext.doOnTabSelected
-import com.ichi2.anki.utils.ext.getIntOrNull
-import com.ichi2.anki.utils.ext.sharedPrefs
 import com.ichi2.anki.workarounds.SafeWebViewLayout
-import com.ichi2.themes.Themes
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 class TemplatePreviewerFragment :
     CardViewerFragment(R.layout.fragment_template_previewer),
@@ -69,66 +62,12 @@ class TemplatePreviewerFragment :
                     }
             }.launchIn(lifecycleScope)
 
-        if (sharedPrefs().getBoolean("safeDisplay", false)) {
-            binding.webViewContainer.elevation = 0F
-        }
-
-        arguments?.getIntOrNull(ARG_BACKGROUND_OVERRIDE_COLOR)?.let { color ->
-            view.setBackgroundColor(color)
-        }
-
         binding.webViewContainer.setFrameStyle()
     }
 
     /**
-     * Sets up the tab layout for this previewer fragment.
-     * This method should be called from the hosting activity after the fragment is attached.
-     *
-     * @param tabLayout The TabLayout to configure with template tabs
-     */
-    fun setupTabs(tabLayout: TabLayout) {
-        launchCatchingTask {
-            setupPreviewerTabs(tabLayout)
-        }
-    }
-
-    /**
-     * Sets up the previewer tabs with appropriate titles and selection handling.
-     *
-     * @param tabLayout The tab layout to configure
-     */
-    private suspend fun setupPreviewerTabs(tabLayout: TabLayout) {
-        tabLayout.removeAllTabs()
-
-        val backgroundColor =
-            Themes.getColorFromAttr(requireContext(), R.attr.alternativeBackgroundColor)
-        tabLayout.setBackgroundColor(backgroundColor)
-
-        val cardsWithEmptyFronts = viewModel.cardsWithEmptyFronts?.await()
-        for ((index, templateName) in viewModel.getTemplateNames().withIndex()) {
-            val tabTitle =
-                if (cardsWithEmptyFronts?.get(index) == true) {
-                    getString(R.string.card_previewer_empty_front_indicator, templateName)
-                } else {
-                    templateName
-                }
-            val newTab = tabLayout.newTab().setText(tabTitle)
-            tabLayout.addTab(newTab)
-        }
-
-        tabLayout.selectTab(tabLayout.getTabAt(viewModel.getCurrentTabIndex()))
-
-        // Remove any existing listeners to avoid duplicates
-        tabLayout.clearOnTabSelectedListeners()
-        tabLayout.doOnTabSelected { tab ->
-            Timber.v("Selected tab %d", tab.position)
-            viewModel.onTabSelected(tab.position)
-        }
-    }
-
-    /**
      * Updates the content displayed in the previewer with the provided fields and tags
-     * Only updates the webView and not the tabs
+     *
      * Should not be called for cloze deletions, since they they have dynamic ord
      *
      * @param fields The list of field values to display
@@ -150,19 +89,10 @@ class TemplatePreviewerFragment :
 
     companion object {
         const val ARGS_KEY = "templatePreviewerArgs"
-        private const val ARG_BACKGROUND_OVERRIDE_COLOR = "arg_background_override_color"
 
-        /**
-         * @param backgroundOverrideColor optional color to be used as background on the root view
-         * of this fragment
-         */
-        fun newInstance(
-            arguments: TemplatePreviewerArguments,
-            backgroundOverrideColor: Int? = null,
-        ): TemplatePreviewerFragment =
+        fun newInstance(arguments: TemplatePreviewerArguments): TemplatePreviewerFragment =
             TemplatePreviewerFragment().apply {
                 val args = bundleOf(ARGS_KEY to arguments)
-                backgroundOverrideColor?.let { args.putInt(ARG_BACKGROUND_OVERRIDE_COLOR, backgroundOverrideColor) }
                 this.arguments = args
             }
     }

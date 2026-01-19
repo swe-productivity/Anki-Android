@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import com.ichi2.anki.R
 import com.ichi2.anki.cardviewer.Gesture
 import com.ichi2.anki.cardviewer.GestureListener
+import com.ichi2.anki.databinding.ViewGesturePickerBinding
 import com.ichi2.anki.dialogs.WarningDisplay
 import com.ichi2.utils.UiUtil.setSelectedValue
 import com.squareup.seismic.ShakeDetector
@@ -39,8 +40,6 @@ import timber.log.Timber
 /** [View] which allows selection of a gesture either via taps/swipes, or via a [Spinner]
  * The spinner aids discoverability of [Gesture.DOUBLE_TAP]
  * as it is not explained in [GestureDisplay].
- *
- * Current use is via [com.ichi2.anki.dialogs.GestureSelectionDialogBuilder]
  */
 class GesturePicker(
     ctx: Context,
@@ -49,27 +48,22 @@ class GesturePicker(
 ) : ConstraintLayout(ctx, attributeSet, defStyleAttr),
     WarningDisplay,
     ShakeDetector.Listener {
-    private val gestureSpinner: Spinner
-    private val gestureDisplay: GestureDisplay
-    override val warningTextView: FixedTextView
+    private val binding: ViewGesturePickerBinding
+    override val warningTextView get() = binding.warning
 
     private var onGestureListener: GestureListener? = null
     private var shakeDetector: ShakeDetector? = null
     private val sensorManager get() = ContextCompat.getSystemService(context, SensorManager::class.java)
-    private var shakeEnabled = true
 
     init {
-        val inflater = LayoutInflater.from(ctx)
-        inflater.inflate(R.layout.gesture_picker, this)
-        gestureDisplay = findViewById(R.id.gestureDisplay)
-        gestureSpinner = findViewById(R.id.spinner_gesture)
-        warningTextView = findViewById(R.id.warning)
-        gestureDisplay.setGestureChangedListener(this::onGesture)
-        gestureSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allGestures())
-        gestureSpinner.onItemSelectedListener = InnerSpinner()
+        val inflater = ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        binding = ViewGesturePickerBinding.inflate(inflater, this, true)
+        binding.gestureDisplay.setGestureChangedListener(this::onGesture)
+        binding.gestureSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allGestures())
+        binding.gestureSpinner.onItemSelectedListener = InnerSpinner()
     }
 
-    fun getGesture() = gestureDisplay.getGesture()
+    fun getGesture() = binding.gestureDisplay.getGesture()
 
     private fun onGesture(gesture: Gesture?) {
         Timber.d("gesture: %s", gesture?.toDisplayString(context))
@@ -84,8 +78,8 @@ class GesturePicker(
     }
 
     private fun setGesture(gesture: Gesture?) {
-        gestureSpinner.setSelectedValue(GestureWrapper(gesture))
-        gestureDisplay.setGesture(gesture)
+        binding.gestureSpinner.setSelectedValue(GestureWrapper(gesture))
+        binding.gestureDisplay.setGesture(gesture)
     }
 
     /** Not fired if deselected */
@@ -95,7 +89,7 @@ class GesturePicker(
 
     private fun allGestures(): List<GestureWrapper> = (listOf(null) + availableGestures()).map(this::GestureWrapper).toList()
 
-    private fun availableGestures() = gestureDisplay.availableValues()
+    private fun availableGestures() = binding.gestureDisplay.availableValues()
 
     inner class GestureWrapper(
         val gesture: Gesture?,

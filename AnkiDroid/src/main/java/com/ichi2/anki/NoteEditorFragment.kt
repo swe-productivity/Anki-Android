@@ -361,6 +361,7 @@ class NoteEditorFragment :
                         closeNoteEditor()
                     } else {
                         Timber.d("onActivityResult() template edit return, in add mode, just re-display")
+                        updateCards(editorNote!!.notetype)
                     }
                 } else {
                     Timber.d("onActivityResult() template edit return - current card exists")
@@ -1228,6 +1229,17 @@ class NoteEditorFragment :
             return false
         }
 
+        fun fieldsEdited(): Boolean {
+            // Editing an existing note: Check to see if the fields are changed
+            if (!addNote) {
+                return editFields!!.map { it.text?.toString() } != editorNote!!.fields.toList()
+            }
+
+            if (!isFieldEdited) return false
+            // BUG: Does not account for sticky fields
+            return editFields!!.any { it.text.toString() != "" }
+        }
+
         // changed note type?
         if (!addNote && currentEditedCard != null) {
             val newNoteType = currentlySelectedNotetype
@@ -1240,18 +1252,14 @@ class NoteEditorFragment :
         if (!addNote && currentEditedCard != null && currentEditedCard!!.currentDeckId() != deckId) {
             return true
         }
+
         // changed fields?
-        if (isFieldEdited) {
-            for (value in editFields!!) {
-                if (value.text.toString() != "") {
-                    return true
-                }
-            }
-            return false
-        } else {
-            return isTagsEdited
+        if (fieldsEdited()) {
+            return true
         }
+
         // changed tags?
+        return isTagsEdited
     }
 
     private fun collectionHasLoaded(): Boolean = allNoteTypeIds != null
@@ -1428,6 +1436,7 @@ class NoteEditorFragment :
      * Change the note type from oldNoteType to newNoteType, handling the case where a full sync will be required
      */
     @NeedsTest("test changing note type")
+    @Suppress("Deprecation") // Replace with ChangeNoteTypeDialog
     private fun changeNoteType(
         oldNotetype: NotetypeJson,
         newNotetype: NotetypeJson,

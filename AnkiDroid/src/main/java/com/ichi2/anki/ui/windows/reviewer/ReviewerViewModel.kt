@@ -29,14 +29,12 @@ import com.ichi2.anki.Reviewer
 import com.ichi2.anki.asyncIO
 import com.ichi2.anki.browser.BrowserDestination
 import com.ichi2.anki.cardviewer.SingleCardSide
-import com.ichi2.anki.common.time.TimeManager
 import com.ichi2.anki.launchCatchingIO
 import com.ichi2.anki.libanki.Card
 import com.ichi2.anki.libanki.CardId
 import com.ichi2.anki.libanki.Collection
 import com.ichi2.anki.libanki.NoteId
 import com.ichi2.anki.libanki.redoLabel
-import com.ichi2.anki.libanki.sched.Counts
 import com.ichi2.anki.libanki.sched.CurrentQueueState
 import com.ichi2.anki.libanki.undoLabel
 import com.ichi2.anki.noteeditor.NoteEditorLauncher
@@ -58,17 +56,14 @@ import com.ichi2.anki.servicelayer.MARKED_TAG
 import com.ichi2.anki.servicelayer.NoteService
 import com.ichi2.anki.servicelayer.isBuryNoteAvailable
 import com.ichi2.anki.servicelayer.isSuspendNoteAvailable
-import com.ichi2.anki.settings.Prefs
 import com.ichi2.anki.tryRedo
 import com.ichi2.anki.tryUndo
 import com.ichi2.anki.ui.windows.reviewer.autoadvance.AnswerAction
 import com.ichi2.anki.ui.windows.reviewer.autoadvance.AutoAdvance
 import com.ichi2.anki.ui.windows.reviewer.autoadvance.AutoAdvanceAction
 import com.ichi2.anki.ui.windows.reviewer.autoadvance.QuestionAction
-import com.ichi2.anki.utils.CollectionPreferences
 import com.ichi2.anki.utils.Destination
 import com.ichi2.anki.utils.ext.answerCard
-import com.ichi2.anki.utils.ext.cardStateCustomizer
 import com.ichi2.anki.utils.ext.cardStatsNoCardClean
 import com.ichi2.anki.utils.ext.currentCardStudy
 import com.ichi2.anki.utils.ext.flag
@@ -124,12 +119,12 @@ class ReviewerViewModel(
     val statesMutationEvalFlow = MutableSharedFlow<String>()
 
     override val server: AnkiServer = AnkiServer(this, repository.getServerPort()).also { it.start() }
-    private val stateMutationKey = TimeManager.time.intTimeMS().toString()
-    private val stateMutationJs: Deferred<String> = asyncIO { withCol { cardStateCustomizer } }
+    private val stateMutationKey = repository.generateStateMutationKey()
+    private val stateMutationJs: Deferred<String> = asyncIO { repository.getCustomSchedulingJs() }
     private var typedAnswer = ""
 
     private val autoAdvance = AutoAdvance(viewModelScope, this, currentCard)
-    private val isHtmlTypeAnswerEnabled = Prefs.isHtmlTypeAnswerEnabled
+    private val isHtmlTypeAnswerEnabled = repository.isHtmlTypeAnswerEnabled
     val answerTimer = AnswerTimer()
 
     /**
@@ -146,10 +141,7 @@ class ReviewerViewModel(
     private var mutationSignal = CompletableDeferred(Unit)
 
     val answerButtonsNextTimeFlow: MutableStateFlow<AnswerButtonsNextTime?> = MutableStateFlow(null)
-    private val shouldShowNextTimes: Deferred<Boolean> =
-        asyncIO {
-            CollectionPreferences.getShowIntervalOnButtons()
-        }
+    private val shouldShowNextTimes = asyncIO { repository.getShouldShowNextTimes() }
 
     init {
         ChangeManager.subscribe(this)
