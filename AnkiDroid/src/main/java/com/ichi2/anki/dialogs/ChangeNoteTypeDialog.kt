@@ -115,11 +115,7 @@ class ChangeNoteTypeDialog : AnalyticsDialogFragment() {
         return MaterialAlertDialogBuilder(requireContext())
             .create {
                 title(
-                    text =
-                        TR.browsingChangeNotetype().toSentenceCase(
-                            this@ChangeNoteTypeDialog,
-                            R.string.sentence_change_note_type,
-                        ),
+                    text = TR.browsingChangeNotetype().toSentenceCase(R.string.sentence_change_note_type),
                 )
                 positiveButton(R.string.dialog_ok)
                 negativeButton(R.string.dialog_cancel)
@@ -332,6 +328,12 @@ class ChangeNoteTypeDialog : AnalyticsDialogFragment() {
             }
         }
 
+        override fun onResume() {
+            super.onResume()
+            // update ViewPager2 height
+            binding.root.requestLayout()
+        }
+
         fun setupFlows() {
             lifecycleScope.launch {
                 Timber.d("setupFlows: collecting outputNoteTypeFlow")
@@ -463,6 +465,12 @@ class ChangeNoteTypeDialog : AnalyticsDialogFragment() {
                     }
                 }
             }
+        }
+
+        override fun onResume() {
+            super.onResume()
+            // update ViewPager2 height
+            binding.root.requestLayout()
         }
 
         fun setupFlows() {

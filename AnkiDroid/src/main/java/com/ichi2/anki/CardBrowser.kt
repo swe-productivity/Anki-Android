@@ -64,6 +64,7 @@ import com.ichi2.anki.browser.IdsFile
 import com.ichi2.anki.browser.SaveSearchResult
 import com.ichi2.anki.browser.SharedPreferencesLastDeckIdRepository
 import com.ichi2.anki.browser.registerFindReplaceHandler
+import com.ichi2.anki.browser.search.savedFilters
 import com.ichi2.anki.browser.toCardBrowserLaunchOptions
 import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
@@ -382,16 +383,15 @@ open class CardBrowser :
                 SavedBrowserSearchesDialogFragment.TYPE_SEARCH_SELECTED -> {
                     Timber.d("Selecting saved search selection named: %s", searchName)
                     launchCatchingTask {
-                        viewModel.savedSearches()[searchName]?.also { savedSearch ->
-                            Timber.d("OnSelection using search terms: %s", savedSearch)
-                            searchForQuery(savedSearch)
-                        }
+                        val search = viewModel.savedSearches().find { it.name == searchName } ?: return@launchCatchingTask
+                        Timber.d("OnSelection using search terms: %s", search.query)
+                        searchForQuery(search.query)
                     }
                 }
                 SavedBrowserSearchesDialogFragment.TYPE_SEARCH_REMOVED -> {
                     Timber.d("Removing saved search named: %s", searchName)
                     launchCatchingTask {
-                        val updatedFilters = viewModel.removeSavedSearch(searchName)
+                        val (_, updatedFilters) = viewModel.removeSavedSearch(searchName)
                         if (updatedFilters.isEmpty()) {
                             mySearchesItem!!.isVisible = false
                         }
@@ -788,8 +788,7 @@ open class CardBrowser :
             saveSearchItem = menu.findItem(R.id.action_save_search)
             saveSearchItem?.isVisible = false // the searchview's query always starts empty.
             mySearchesItem = menu.findItem(R.id.action_list_my_searches)
-            val savedFiltersObj = viewModel.savedSearchesUnsafe(getColUnsafe)
-            mySearchesItem!!.isVisible = savedFiltersObj.isNotEmpty()
+            mySearchesItem!!.isVisible = getColUnsafe.config.savedFilters.isNotEmpty()
             searchItem = menu.findItem(R.id.action_search)
             searchItem!!.setOnActionExpandListener(
                 object : MenuItem.OnActionExpandListener {
@@ -867,15 +866,15 @@ open class CardBrowser :
         }
 
         actionBarMenu?.findItem(R.id.action_reschedule_cards)?.title =
-            TR.actionsSetDueDate().toSentenceCase(this, R.string.sentence_set_due_date)
+            TR.actionsSetDueDate().toSentenceCase(R.string.sentence_set_due_date)
 
         actionBarMenu?.findItem(R.id.action_grade_now)?.title =
-            TR.actionsGradeNow().toSentenceCase(this, R.string.sentence_grade_now)
+            TR.actionsGradeNow().toSentenceCase(R.string.sentence_grade_now)
 
         val isFindReplaceEnabled = sharedPrefs().getBoolean(getString(R.string.pref_browser_find_replace), false)
         menu.findItem(R.id.action_find_replace)?.apply {
             isVisible = isFindReplaceEnabled
-            title = TR.browsingFindAndReplace().toSentenceCase(this@CardBrowser, R.string.sentence_find_and_replace)
+            title = TR.browsingFindAndReplace().toSentenceCase(R.string.sentence_find_and_replace)
         }
 
         previewItem = menu.findItem(R.id.action_preview)
@@ -946,13 +945,13 @@ open class CardBrowser :
 
         actionBarMenu.findItem(R.id.action_flag).isVisible = viewModel.hasSelectedAnyRows()
         actionBarMenu.findItem(R.id.action_suspend_card).apply {
-            title = TR.browsingToggleSuspend().toSentenceCase(this@CardBrowser, R.string.sentence_toggle_suspend)
+            title = TR.browsingToggleSuspend().toSentenceCase(R.string.sentence_toggle_suspend)
             // TODO: I don't think this icon is necessary
             setIcon(R.drawable.ic_suspend)
             isVisible = viewModel.hasSelectedAnyRows()
         }
         actionBarMenu.findItem(R.id.action_toggle_bury).apply {
-            title = TR.browsingToggleBury().toSentenceCase(this@CardBrowser, R.string.sentence_toggle_bury)
+            title = TR.browsingToggleBury().toSentenceCase(R.string.sentence_toggle_bury)
             isVisible = viewModel.hasSelectedAnyRows()
         }
         actionBarMenu.findItem(R.id.action_mark_card).apply {
