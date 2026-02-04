@@ -4,6 +4,7 @@ package com.ichi2.anim
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.os.Parcelable
 import android.util.LayoutDirection
 import androidx.core.app.ActivityOptionsCompat
@@ -11,30 +12,88 @@ import com.ichi2.anki.R
 import kotlinx.parcelize.Parcelize
 
 object ActivityTransitionAnimation {
-    @Suppress("DEPRECATION", "deprecated in API34 for predictive back, must plumb through new open/close parameter")
+    private fun overrideTransition(
+        activity: Activity,
+        enter: Int,
+        exit: Int,
+        open: Boolean,
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val ty =
+                if (open) {
+                    Activity.OVERRIDE_TRANSITION_OPEN
+                } else {
+                    Activity.OVERRIDE_TRANSITION_CLOSE
+                }
+            activity.overrideActivityTransition(ty, enter, exit)
+        } else {
+            @Suppress("DEPRECATION", "deprecated in API34 for predictive back, must plumb through new open/close parameter")
+            activity.overridePendingTransition(
+                enter,
+                exit,
+            )
+        }
+    }
+
     fun slide(
         activity: Activity,
         direction: Direction,
+        open: Boolean,
     ) {
         when (direction) {
             Direction.START ->
                 if (isRightToLeft(activity)) {
-                    activity.overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out)
+                    overrideTransition(activity, R.anim.slide_right_in, R.anim.slide_right_out, open)
                 } else {
-                    activity.overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out)
+                    overrideTransition(activity, R.anim.slide_left_in, R.anim.slide_left_out, open)
                 }
+
             Direction.END ->
                 if (isRightToLeft(activity)) {
-                    activity.overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out)
+                    overrideTransition(activity, R.anim.slide_left_in, R.anim.slide_left_out, open)
                 } else {
-                    activity.overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out)
+                    overrideTransition(
+                        activity,
+                        R.anim.slide_right_in,
+                        R.anim.slide_right_out,
+                        open,
+                    )
                 }
-            Direction.RIGHT -> activity.overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out)
-            Direction.LEFT -> activity.overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out)
-            Direction.FADE -> activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-            Direction.UP -> activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_up_out)
-            Direction.DOWN -> activity.overridePendingTransition(R.anim.slide_down_in, R.anim.slide_down_out)
-            Direction.NONE -> activity.overridePendingTransition(R.anim.none, R.anim.none)
+
+            Direction.RIGHT ->
+                overrideTransition(
+                    activity,
+                    R.anim.slide_right_in,
+                    R.anim.slide_right_out,
+                    open,
+                )
+
+            Direction.LEFT ->
+                overrideTransition(
+                    activity,
+                    R.anim.slide_left_in,
+                    R.anim.slide_left_out,
+                    open,
+                )
+
+            Direction.FADE -> overrideTransition(activity, R.anim.fade_in, R.anim.fade_out, open)
+            Direction.UP ->
+                overrideTransition(
+                    activity,
+                    R.anim.slide_up_in,
+                    R.anim.slide_up_out,
+                    open,
+                )
+
+            Direction.DOWN ->
+                overrideTransition(
+                    activity,
+                    R.anim.slide_down_in,
+                    R.anim.slide_down_out,
+                    open,
+                )
+
+            Direction.NONE -> overrideTransition(activity, R.anim.none, R.anim.none, open)
             Direction.DEFAULT -> {
             }
         }
@@ -56,8 +115,13 @@ object ActivityTransitionAnimation {
                         R.anim.slide_right_out,
                     )
                 } else {
-                    ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_left_in, R.anim.slide_left_out)
+                    ActivityOptionsCompat.makeCustomAnimation(
+                        activity,
+                        R.anim.slide_left_in,
+                        R.anim.slide_left_out,
+                    )
                 }
+
             Direction.END ->
                 if (isRightToLeft(
                         activity,
@@ -69,16 +133,58 @@ object ActivityTransitionAnimation {
                         R.anim.slide_left_out,
                     )
                 } else {
-                    ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_right_in, R.anim.slide_right_out)
+                    ActivityOptionsCompat.makeCustomAnimation(
+                        activity,
+                        R.anim.slide_right_in,
+                        R.anim.slide_right_out,
+                    )
                 }
-            Direction.RIGHT -> ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_right_in, R.anim.slide_right_out)
-            Direction.LEFT -> ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_left_in, R.anim.slide_left_out)
-            Direction.FADE -> ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.fade_in, R.anim.fade_out)
-            Direction.UP -> ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_up_in, R.anim.slide_up_out)
-            Direction.DOWN -> ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.slide_down_in, R.anim.slide_down_out)
-            Direction.NONE -> ActivityOptionsCompat.makeCustomAnimation(activity, R.anim.none, R.anim.none)
+
+            Direction.RIGHT ->
+                ActivityOptionsCompat.makeCustomAnimation(
+                    activity,
+                    R.anim.slide_right_in,
+                    R.anim.slide_right_out,
+                )
+
+            Direction.LEFT ->
+                ActivityOptionsCompat.makeCustomAnimation(
+                    activity,
+                    R.anim.slide_left_in,
+                    R.anim.slide_left_out,
+                )
+
+            Direction.FADE ->
+                ActivityOptionsCompat.makeCustomAnimation(
+                    activity,
+                    R.anim.fade_in,
+                    R.anim.fade_out,
+                )
+
+            Direction.UP ->
+                ActivityOptionsCompat.makeCustomAnimation(
+                    activity,
+                    R.anim.slide_up_in,
+                    R.anim.slide_up_out,
+                )
+
+            Direction.DOWN ->
+                ActivityOptionsCompat.makeCustomAnimation(
+                    activity,
+                    R.anim.slide_down_in,
+                    R.anim.slide_down_out,
+                )
+
+            Direction.NONE ->
+                ActivityOptionsCompat.makeCustomAnimation(
+                    activity,
+                    R.anim.none,
+                    R.anim.none,
+                )
+
             Direction.DEFAULT -> // this is the default animation, we shouldn't try to override it
                 ActivityOptionsCompat.makeBasic()
+
             else -> ActivityOptionsCompat.makeBasic()
         }
 
