@@ -40,6 +40,7 @@ import com.ichi2.anki.databinding.FragmentMediaCheckBinding
 import com.ichi2.anki.launchCatchingTask
 import com.ichi2.anki.ui.internationalization.toSentenceCase
 import com.ichi2.anki.withProgress
+import com.ichi2.themes.Themes
 import com.ichi2.utils.cancelable
 import com.ichi2.utils.message
 import com.ichi2.utils.negativeButton
@@ -131,11 +132,19 @@ class MediaCheckFragment : Fragment(R.layout.fragment_media_check) {
     }
 
     private fun updateWebView(report: String) {
+        val backgroundColor = Themes.getColorFromAttr(requireContext(), android.R.attr.colorBackground)
+        val textColor = Themes.getColorFromAttr(requireContext(), android.R.attr.textColorPrimary)
+
+        val backgroundColorHex = String.format("#%06X", 0xFFFFFF and backgroundColor)
+        val textColorHex = String.format("#%06X", 0xFFFFFF and textColor)
+
         val html =
             """
             <html>
                 <body style="
-                      padding: 0px 8px;
+                    background-color: $backgroundColorHex;
+                    color: $textColorHex;
+                    padding: 0px 8px;
                     font-size:14px;
                     white-space: pre-wrap;">$report
                 </body>
