@@ -335,7 +335,7 @@ open class AnkiActivity(
     ) {
         enableIntentAnimation(intent)
         super.startActivity(intent)
-        enableActivityAnimation(animation, true)
+        enableActivityAnimation(animation, open = true)
     }
 
     override fun finish() {
@@ -345,13 +345,15 @@ open class AnkiActivity(
     fun finishWithAnimation(animation: Direction) {
         Timber.i("finishWithAnimation %s", animation)
         super.finish()
-        enableActivityAnimation(animation, false)
+        enableActivityAnimation(animation, open = false)
     }
 
     private fun disableIntentAnimation(intent: Intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     }
 
+    /** when `open` is true, disables the animation for entering this activity. When false,
+     disables the animation for closing this activity */
     private fun disableActivityAnimation(open: Boolean) {
         ActivityTransitionAnimation.slide(this, NONE, open)
     }
@@ -363,6 +365,8 @@ open class AnkiActivity(
         }
     }
 
+    /** when `open` is true, overrides the animation for entering this activity. When false,
+     overrides the animation for closing this activity */
     private fun enableActivityAnimation(
         animation: Direction,
         open: Boolean,

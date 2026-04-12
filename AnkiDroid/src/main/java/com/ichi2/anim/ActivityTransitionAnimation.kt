@@ -7,95 +7,49 @@ import android.content.Context
 import android.os.Build
 import android.os.Parcelable
 import android.util.LayoutDirection
+import androidx.annotation.AnimRes
 import androidx.core.app.ActivityOptionsCompat
 import com.ichi2.anki.R
+import com.ichi2.compat.CompatHelper
 import kotlinx.parcelize.Parcelize
 
 object ActivityTransitionAnimation {
-    private fun overrideTransition(
-        activity: Activity,
-        enter: Int,
-        exit: Int,
-        open: Boolean,
-    ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            val ty =
-                if (open) {
-                    Activity.OVERRIDE_TRANSITION_OPEN
-                } else {
-                    Activity.OVERRIDE_TRANSITION_CLOSE
-                }
-            activity.overrideActivityTransition(ty, enter, exit)
-        } else {
-            @Suppress("DEPRECATION", "deprecated in API34 for predictive back, must plumb through new open/close parameter")
-            activity.overridePendingTransition(
-                enter,
-                exit,
-            )
-        }
-    }
-
+    /** when `open` is true, overrides the animation for entering this activity. When false,
+     overrides the animation for closing this activity */
     fun slide(
         activity: Activity,
         direction: Direction,
         open: Boolean,
     ) {
+        fun overrideTransition(
+            enter: Int,
+            exit: Int,
+        ) {
+            CompatHelper.compat.overrideTransition(activity, R.anim.slide_right_in, R.anim.slide_right_out, open)
+        }
+
         when (direction) {
             Direction.START ->
                 if (isRightToLeft(activity)) {
-                    overrideTransition(activity, R.anim.slide_right_in, R.anim.slide_right_out, open)
+                    overrideTransition(R.anim.slide_right_in, R.anim.slide_right_out)
                 } else {
-                    overrideTransition(activity, R.anim.slide_left_in, R.anim.slide_left_out, open)
+                    overrideTransition(R.anim.slide_left_in, R.anim.slide_left_out)
                 }
 
             Direction.END ->
                 if (isRightToLeft(activity)) {
-                    overrideTransition(activity, R.anim.slide_left_in, R.anim.slide_left_out, open)
+                    overrideTransition(R.anim.slide_left_in, R.anim.slide_left_out)
                 } else {
-                    overrideTransition(
-                        activity,
-                        R.anim.slide_right_in,
-                        R.anim.slide_right_out,
-                        open,
-                    )
+                    overrideTransition(R.anim.slide_right_in, R.anim.slide_right_out)
                 }
 
-            Direction.RIGHT ->
-                overrideTransition(
-                    activity,
-                    R.anim.slide_right_in,
-                    R.anim.slide_right_out,
-                    open,
-                )
-
-            Direction.LEFT ->
-                overrideTransition(
-                    activity,
-                    R.anim.slide_left_in,
-                    R.anim.slide_left_out,
-                    open,
-                )
-
-            Direction.FADE -> overrideTransition(activity, R.anim.fade_in, R.anim.fade_out, open)
-            Direction.UP ->
-                overrideTransition(
-                    activity,
-                    R.anim.slide_up_in,
-                    R.anim.slide_up_out,
-                    open,
-                )
-
-            Direction.DOWN ->
-                overrideTransition(
-                    activity,
-                    R.anim.slide_down_in,
-                    R.anim.slide_down_out,
-                    open,
-                )
-
-            Direction.NONE -> overrideTransition(activity, R.anim.none, R.anim.none, open)
-            Direction.DEFAULT -> {
-            }
+            Direction.RIGHT -> overrideTransition(R.anim.slide_right_in, R.anim.slide_right_out)
+            Direction.LEFT -> overrideTransition(R.anim.slide_left_in, R.anim.slide_left_out)
+            Direction.FADE -> overrideTransition(R.anim.fade_in, R.anim.fade_out)
+            Direction.UP -> overrideTransition(R.anim.slide_up_in, R.anim.slide_up_out)
+            Direction.DOWN -> overrideTransition(R.anim.slide_down_in, R.anim.slide_down_out)
+            Direction.NONE -> overrideTransition(R.anim.none, R.anim.none)
+            Direction.DEFAULT -> { }
         }
     }
 
