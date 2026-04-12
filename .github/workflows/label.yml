@@ -160,8 +160,6 @@ jobs:
                   });
                 }
               }
-
-octokit.paginate.iterator() accepts the same options as octokit.paginate().
             }
 
             const changedFiles = await github.rest.pulls.listFiles({
