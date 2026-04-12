@@ -133,7 +133,6 @@ open class AnkiActivity(
             }
         }
 
-//    @Suppress("deprecation") // #9332: UI Visibility -> Insets
     override fun onCreate(savedInstanceState: Bundle?) {
         // The hardware buttons should control the music volume
         volumeControlStream = AudioManager.STREAM_MUSIC
@@ -142,16 +141,11 @@ open class AnkiActivity(
         Themes.disableXiaomiForceDarkMode(this)
         super.onCreate(savedInstanceState)
         // Disable the notifications bar if running under the test monkey.
-        if (AdaptionUtil.isUserATestClient) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.insetsController?.hide(WindowInsetsCompat.Type.statusBars())
-            } else {
-                @Suppress("deprecation")
-                window.setFlags(
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                )
-            }
+        // This is a work-around for aa issue with the monkey feature of adb - when the
+        // monkey runs on a physical device, it can pull the status bar down, and escape the app
+        // under test.
+        if (AdaptionUtil.isUserATestClient && window != null) {
+            CompatHelper.compat.hideStatusBar(window)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             @Suppress("deprecation")
