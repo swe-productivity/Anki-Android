@@ -352,8 +352,10 @@ open class AnkiActivity(
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     }
 
-    /** when `open` is true, disables the animation for entering this activity. When false,
-     disables the animation for closing this activity */
+    /**
+     * @param open when `true`, overrides the animation for entering this activity.
+     * When `false`, overrides the animation for closing this activity
+     */
     private fun disableActivityAnimation(open: Boolean) {
         ActivityTransitionAnimation.slide(this, NONE, open)
     }
@@ -365,8 +367,10 @@ open class AnkiActivity(
         }
     }
 
-    /** when `open` is true, overrides the animation for entering this activity. When false,
-     overrides the animation for closing this activity */
+    /**
+     * @param open when `true`, overrides the animation for entering this activity.
+     * When `false`, overrides the animation for closing this activity
+     */
     private fun enableActivityAnimation(
         animation: Direction,
         open: Boolean,

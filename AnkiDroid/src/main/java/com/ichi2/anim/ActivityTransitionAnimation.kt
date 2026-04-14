@@ -14,8 +14,10 @@ import com.ichi2.compat.CompatHelper
 import kotlinx.parcelize.Parcelize
 
 object ActivityTransitionAnimation {
-    /** when `open` is true, overrides the animation for entering this activity. When false,
-     overrides the animation for closing this activity */
+    /**
+     * @param open when `true`, overrides the animation for entering this activity.
+     * When `false`, overrides the animation for closing this activity
+     */
     fun slide(
         activity: Activity,
         direction: Direction,
@@ -25,7 +27,7 @@ object ActivityTransitionAnimation {
             enter: Int,
             exit: Int,
         ) {
-            CompatHelper.compat.overrideTransition(activity, R.anim.slide_right_in, R.anim.slide_right_out, open)
+            CompatHelper.compat.overrideTransition(activity, enter, exit, open)
         }
 
         when (direction) {
