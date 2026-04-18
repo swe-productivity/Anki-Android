@@ -40,12 +40,14 @@ import com.ichi2.anki.databinding.FragmentMediaCheckBinding
 import com.ichi2.anki.launchCatchingTask
 import com.ichi2.anki.ui.internationalization.toSentenceCase
 import com.ichi2.anki.withProgress
+import com.ichi2.themes.Themes
 import com.ichi2.utils.cancelable
 import com.ichi2.utils.message
 import com.ichi2.utils.negativeButton
 import com.ichi2.utils.positiveButton
 import com.ichi2.utils.show
 import com.ichi2.utils.title
+import com.ichi2.utils.toRGBHex
 import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -66,7 +68,7 @@ class MediaCheckFragment : Fragment(R.layout.fragment_media_check) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.apply {
-            setTitle(TR.mediaCheckCheckMediaAction().toSentenceCase(requireContext(), R.string.check_media))
+            setTitle(TR.mediaCheckCheckMediaAction().toSentenceCase(R.string.check_media))
             setNavigationOnClickListener {
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             }
@@ -105,11 +107,11 @@ class MediaCheckFragment : Fragment(R.layout.fragment_media_check) {
                     menuInflater.inflate(R.menu.media_check_menu, menu)
                     menu.findItem(R.id.action_restore_trash).apply {
                         isVisible = true
-                        title = TR.mediaCheckRestoreTrash().toSentenceCase(requireContext(), R.string.sentence_restore_deleted)
+                        title = TR.mediaCheckRestoreTrash().toSentenceCase(R.string.sentence_restore_deleted)
                     }
                     menu.findItem(R.id.action_empty_trash).apply {
                         isVisible = true
-                        title = TR.mediaCheckEmptyTrash().toSentenceCase(requireContext(), R.string.sentence_empty_trash)
+                        title = TR.mediaCheckEmptyTrash().toSentenceCase(R.string.sentence_empty_trash)
                     }
                 }
 
@@ -131,11 +133,19 @@ class MediaCheckFragment : Fragment(R.layout.fragment_media_check) {
     }
 
     private fun updateWebView(report: String) {
+        val backgroundColor = Themes.getColorFromAttr(requireContext(), android.R.attr.colorBackground)
+        val textColor = Themes.getColorFromAttr(requireContext(), android.R.attr.textColorPrimary)
+
+        val backgroundColorHex = backgroundColor.toRGBHex()
+        val textColorHex = textColor.toRGBHex()
+
         val html =
             """
             <html>
                 <body style="
-                      padding: 0px 8px;
+                    background-color: $backgroundColorHex;
+                    color: $textColorHex;
+                    padding: 0px 8px;
                     font-size:14px;
                     white-space: pre-wrap;">$report
                 </body>
@@ -152,7 +162,7 @@ class MediaCheckFragment : Fragment(R.layout.fragment_media_check) {
             text =
                 TR
                     .mediaCheckAddTag()
-                    .toSentenceCase(requireContext(), R.string.sentence_tag_missing)
+                    .toSentenceCase(R.string.sentence_tag_missing)
 
             setOnClickListener {
                 launchCatchingTask {
@@ -168,11 +178,7 @@ class MediaCheckFragment : Fragment(R.layout.fragment_media_check) {
         }
 
         binding.deleteUsedMediaButton.apply {
-            text =
-                TR.mediaCheckDeleteUnused().toSentenceCase(
-                    requireContext(),
-                    R.string.sentence_check_media_delete_unused,
-                )
+            text = TR.mediaCheckDeleteUnused().toSentenceCase(R.string.sentence_check_media_delete_unused)
 
             setOnClickListener {
                 deleteConfirmationDialog()

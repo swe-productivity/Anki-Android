@@ -16,6 +16,7 @@
 
 package com.ichi2.compat
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -32,6 +33,7 @@ import android.provider.MediaStore
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import androidx.annotation.AnimRes
 import androidx.appcompat.widget.TooltipCompat
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
 import timber.log.Timber
@@ -59,6 +61,18 @@ open class BaseCompat : Compat {
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        )
+    }
+
+    override fun overrideTransition(
+        activity: Activity,
+        @AnimRes enter: Int,
+        @AnimRes exit: Int,
+        open: Boolean,
+    ) {
+        activity.overridePendingTransition(
+            enter,
+            exit,
         )
     }
 

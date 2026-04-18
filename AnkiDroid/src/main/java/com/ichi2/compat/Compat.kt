@@ -17,6 +17,7 @@
 
 package com.ichi2.compat
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -31,6 +32,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.view.View
 import android.view.Window
+import androidx.annotation.AnimRes
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -88,6 +90,13 @@ interface Compat {
     fun getMediaRecorder(context: Context): MediaRecorder
 
     fun hideStatusBar(window: Window)
+
+    fun overrideTransition(
+        activity: Activity,
+        @AnimRes enter: Int,
+        @AnimRes exit: Int,
+        open: Boolean,
+    )
 
     fun resolveActivity(
         packageManager: PackageManager,
