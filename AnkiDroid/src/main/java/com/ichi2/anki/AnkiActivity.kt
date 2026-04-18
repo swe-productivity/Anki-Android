@@ -140,13 +140,6 @@ open class AnkiActivity(
         Themes.setTheme(this)
         Themes.disableXiaomiForceDarkMode(this)
         super.onCreate(savedInstanceState)
-        // Disable the notifications bar if running under the test monkey.
-        // This is a work-around for aa issue with the monkey feature of adb - when the
-        // monkey runs on a physical device, it can pull the status bar down, and escape the app
-        // under test.
-        if (AdaptionUtil.isUserATestClient && window != null) {
-            CompatHelper.compat.hideStatusBar(window)
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             @Suppress("deprecation")
             window.navigationBarColor = getColor(R.color.transparent)
@@ -169,6 +162,14 @@ open class AnkiActivity(
 
     override fun onStart() {
         super.onStart()
+        // Disable the notifications bar if running under the test monkey.
+        // This is a work-around for aa issue with the monkey feature of adb - when the
+        // monkey runs on a physical device, it can pull the status bar down, and escape the app
+        // under test.
+        if (AdaptionUtil.isUserATestClient && window != null) {
+            // Note: this is run in `onStart`, since it appears the decorView can be null in `onCreate`
+            CompatHelper.compat.hideStatusBar(window)
+        }
         customTabActivityHelper.bindCustomTabsService(this)
     }
 
