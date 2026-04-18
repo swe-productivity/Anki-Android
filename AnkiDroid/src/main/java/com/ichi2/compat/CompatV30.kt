@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023 David Allison <davidallisongithub@gmail.com>
+ *  Copyright (c) 2026 Cranberry Platypus <cranberryplatypus968@gmail.com>
  *
  *  This program is free software; you can redistribute it and/or modify it under
  *  the terms of the GNU General Public License as published by the Free Software
@@ -16,16 +16,14 @@
 
 package com.ichi2.compat
 
-import android.view.MotionEvent
 import android.view.Window
-import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.WindowInsetsCompat
 
-@RequiresApi(34)
+@RequiresApi(30)
 @Suppress("ktlint:standard:property-naming")
-open class CompatV36 : CompatV34() {
-    // As of API36, insetsController is the correct way to hide the status bar
+open class CompatV30 : CompatV29() {
+    // As of API30, insetsController is the correct way to hide the status bar
     override fun hideStatusBar(window: Window) {
         window.insetsController?.hide(WindowInsetsCompat.Type.statusBars())
     }
