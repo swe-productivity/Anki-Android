@@ -163,7 +163,7 @@ open class AnkiActivity(
     override fun onStart() {
         super.onStart()
         // Disable the notifications bar if running under the test monkey.
-        // This is a work-around for aa issue with the monkey feature of adb - when the
+        // This is a work-around for an issue with the monkey feature of adb - when the
         // monkey runs on a physical device, it can pull the status bar down, and escape the app
         // under test.
         if (AdaptionUtil.isUserATestClient && window != null) {
