@@ -142,6 +142,25 @@ jobs:
               })
             }
 
+            async function checkForComments() {
+              // Try to find comment to delete
+              for await (const page of github.paginate.iterator(
+                octokit.rest.issues.listComments,
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                },
+              )) {
+                for(const comment of page.data) {
+                  if (comment.user && comment.user.login === "github-actions[bot]" && comment.body.includes("This PR contains https://github.com/ankidroid/Anki-Android/labels/Strings changes")) {
+                    return true;
+                  }
+                }
+              }
+              return false;
+            }
+
             const changedFiles = await github.rest.pulls.listFiles({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -163,7 +182,9 @@ jobs:
               if (fileChanged) {
                 if (!pullRequestData.data.labels.find(label => label.name === stringsLabel)) {
                   addLabel([stringsLabel]);
-                  addComments();
+                  if (!await checkForComments()) {
+                    addComments();
+                  }
                 }
                 break;
               }
